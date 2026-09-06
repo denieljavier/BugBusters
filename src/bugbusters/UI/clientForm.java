@@ -1,0 +1,795 @@
+
+package bugbusters.UI;
+
+import java.sql.Connection;
+import javax.swing.JOptionPane;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import javax.swing.table.DefaultTableModel;
+import bugbusters.database.BBConnection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.math.BigDecimal;
+
+/**
+ *
+ * @author Deniel
+ */
+public class clientForm extends javax.swing.JFrame {
+    Connection con = BBConnection.MSAccessConnection();
+    PreparedStatement pst;
+    ResultSet rs;
+    
+    /**
+     * Creates new form clientForm
+     */
+    public clientForm() {
+        initComponents();
+            setLocationRelativeTo(null);
+            tblClient.getSelectionModel().addListSelectionListener(e ->{
+                if(!e.getValueIsAdjusting()){
+                    fillFieldsFromSelectedRow();
+                }
+            });
+      
+            con = BBConnection.MSAccessConnection();
+            loadClientToTable();
+    }
+
+    public void fillFieldsFromSelectedRow(){
+        int row = tblClient.getSelectedRow();
+        if(row == -1) return;
+        
+        // GETTING VALUES FROM THE TABLE
+        String bookingDate = tblClient.getValueAt(row, 0).toString();
+        String lastName = tblClient.getValueAt(row, 1).toString();
+        String firstName = tblClient.getValueAt(row, 2).toString();
+        String contactNum = tblClient.getValueAt(row, 3).toString();
+        String cityAdd = tblClient.getValueAt(row, 4).toString();
+        String homeAdd = tblClient.getValueAt(row, 5).toString();
+        String clientConcerns = tblClient.getValueAt(row, 6).toString();
+        
+        
+        //SETTING TEXT FIELDS
+        textBookingDate.setText(bookingDate);
+        textCFName.setText(firstName);
+        textCLName.setText(lastName);
+        textCnumber.setText(contactNum);
+        textHomeAdd.setText(homeAdd);
+        textCityAdd.setText(cityAdd);
+        textClientConcern.setText(clientConcerns);
+            }
+    
+    private boolean isFormValid(){
+        if(textCFName.getText().trim().isEmpty()) return false;
+        if(textCLName.getText().trim().isEmpty()) return false;
+        if(textCnumber.getText().trim().isEmpty()) return false;
+        if(textHomeAdd.getText().trim().isEmpty()) return false;
+        if(textCityAdd.getText().trim().isEmpty()) return false;
+        if(textBookingDate.getText().trim().isEmpty()) return false;
+        
+        return true;
+    }
+    
+    private void clearFields(){
+        textClientID.setText("");
+        textCFName.setText("");
+        textCLName.setText("");
+        textCnumber.setText("");
+        textBookingDate.setText("");
+        textClientConcern.setText("");
+        textCityAdd.setText("");
+        textHomeAdd.setText("");
+        textCSearch.setText("");
+    }
+    
+    private void loadClientToTable(){
+        try{
+            Connection con = BBConnection.MSAccessConnection();
+            
+            String sql =
+                "SELECT Job.jobDate, " + 
+                "Client.firstName, Client.lastName, Client.contactNum, " +
+                "Client.cityAdd, Client.homeAdd, " +
+                "Report.clientConcerns, " +
+                "Client.clientID, " +
+                "Job.jobID " +
+                "FROM  (Client INNER JOIN Job ON Client.clientID = Job.clientID) " +
+                "INNER JOIN Report ON Job.jobID = Report.jobID ";
+
+//            System.out.println(sql); >>>>>>> THIS IS JUST TO TEST IN MS ACCESS THAT THIS SQL WILL WORK 
+            PreparedStatement pst = con.prepareStatement(sql);
+            ResultSet rs = pst.executeQuery();
+            DefaultTableModel model = (DefaultTableModel)tblClient.getModel();
+            model.setRowCount(0);
+            
+            int rowCount = 0;
+            while (rs.next()){
+                rowCount++;
+                model.addRow(new Object[]{
+                    rs.getDate("jobDate"),
+                    rs.getString("lastName"),   // WHAT IS THE CLIENT'S SURNAME
+                    rs.getString("firstName"),  // WHAT IS THE CLIENT'S GIVEN NAME
+                    rs.getString("contactNum"), // WHAT IS THE CLIENT'S CONTACT NUMBER
+                    rs.getString("cityAdd"),    // WHAT CITY DOES THE CLIENT LIVED
+                    rs.getString("homeAdd"),    // WHERE DOES THE CLIENT LIVES
+                    rs.getString("clientConcerns"),     // WHAR IS THE CLIENT'S CONCERN
+                    rs.getInt("clientID"), // >>>> 7 Hidden
+                    rs.getInt("jobID") // >>>>>>>> 8 Hidden
+                });
+            }
+             System.out.println("Rows from query: " + rowCount);
+            con.close();
+            
+
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+        }
+    }
+    // >>>> BUTOON METHODS <<<< //
+    
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tblClient = new javax.swing.JTable();
+        jLabel1 = new javax.swing.JLabel();
+        textClientID = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        textCLName = new javax.swing.JTextField();
+        textCFName = new javax.swing.JTextField();
+        jLabel5 = new javax.swing.JLabel();
+        textCityAdd = new javax.swing.JTextField();
+        jLabel6 = new javax.swing.JLabel();
+        textHomeAdd = new javax.swing.JTextField();
+        jLabel7 = new javax.swing.JLabel();
+        textCnumber = new javax.swing.JTextField();
+        textClientConcern = new javax.swing.JTextField();
+        jLabel8 = new javax.swing.JLabel();
+        btnSaveBook = new javax.swing.JButton();
+        btnEditBook = new javax.swing.JButton();
+        btnDeleteBook = new javax.swing.JButton();
+        textCSearch = new javax.swing.JTextField();
+        jLabel9 = new javax.swing.JLabel();
+        btnCSearch = new javax.swing.JToggleButton();
+        textBookingDate = new javax.swing.JTextField();
+        jLabel10 = new javax.swing.JLabel();
+        btnRefresh = new javax.swing.JButton();
+        btnReturn = new javax.swing.JButton();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setResizable(false);
+
+        tblClient.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null}
+            },
+            new String [] {
+                "Date", "Last Name", "First Name", "Contact Number", "City Address", "Home Address", "Concerns", "clientID", "jobID"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        tblClient.getTableHeader().setReorderingAllowed(false);
+        tblClient.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblClientMouseClicked(evt);
+            }
+        });
+        jScrollPane1.setViewportView(tblClient);
+        if (tblClient.getColumnModel().getColumnCount() > 0) {
+            tblClient.getColumnModel().getColumn(0).setResizable(false);
+            tblClient.getColumnModel().getColumn(1).setResizable(false);
+            tblClient.getColumnModel().getColumn(2).setResizable(false);
+            tblClient.getColumnModel().getColumn(3).setResizable(false);
+            tblClient.getColumnModel().getColumn(4).setResizable(false);
+            tblClient.getColumnModel().getColumn(5).setResizable(false);
+            tblClient.getColumnModel().getColumn(6).setResizable(false);
+            tblClient.getColumnModel().getColumn(7).setMinWidth(0);
+            tblClient.getColumnModel().getColumn(7).setPreferredWidth(0);
+            tblClient.getColumnModel().getColumn(7).setMaxWidth(0);
+            tblClient.getColumnModel().getColumn(8).setMinWidth(0);
+            tblClient.getColumnModel().getColumn(8).setPreferredWidth(0);
+            tblClient.getColumnModel().getColumn(8).setMaxWidth(0);
+        }
+
+        jLabel1.setFont(new java.awt.Font("Segoe UI Black", 1, 36)); // NOI18N
+        jLabel1.setText("BOOKING FORM");
+
+        textClientID.setEditable(false);
+        textClientID.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        textClientID.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                textClientIDMouseClicked(evt);
+            }
+        });
+        textClientID.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                textClientIDActionPerformed(evt);
+            }
+        });
+
+        jLabel2.setFont(new java.awt.Font("Schadow BT", 1, 14)); // NOI18N
+        jLabel2.setText("FIRST NAME:");
+
+        jLabel3.setFont(new java.awt.Font("Schadow BT", 1, 14)); // NOI18N
+        jLabel3.setText("LAST NAME:");
+
+        jLabel4.setFont(new java.awt.Font("Schadow BT", 1, 14)); // NOI18N
+        jLabel4.setText("CLIENT ID:");
+
+        jLabel5.setFont(new java.awt.Font("Schadow BT", 1, 14)); // NOI18N
+        jLabel5.setText("CITY ADDRESS:");
+
+        jLabel6.setFont(new java.awt.Font("Schadow BT", 1, 14)); // NOI18N
+        jLabel6.setText("HOME ADDRESS:");
+
+        jLabel7.setFont(new java.awt.Font("Schadow BT", 1, 14)); // NOI18N
+        jLabel7.setText("CONTACT NUMBER:");
+
+        jLabel8.setFont(new java.awt.Font("Schadow BT", 1, 14)); // NOI18N
+        jLabel8.setText("CONCERN:");
+
+        btnSaveBook.setFont(new java.awt.Font("Schadow BT", 1, 14)); // NOI18N
+        btnSaveBook.setText("BOOK NOW!");
+        btnSaveBook.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSaveBookActionPerformed(evt);
+            }
+        });
+
+        btnEditBook.setFont(new java.awt.Font("Schadow BT", 1, 14)); // NOI18N
+        btnEditBook.setText("EDIT");
+        btnEditBook.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditBookActionPerformed(evt);
+            }
+        });
+
+        btnDeleteBook.setFont(new java.awt.Font("Schadow BT", 1, 14)); // NOI18N
+        btnDeleteBook.setText("DELETE");
+        btnDeleteBook.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeleteBookActionPerformed(evt);
+            }
+        });
+
+        jLabel9.setFont(new java.awt.Font("Schadow BT", 1, 14)); // NOI18N
+        jLabel9.setText("SEARCH  SURNAME:");
+
+        btnCSearch.setFont(new java.awt.Font("Schadow BT", 1, 14)); // NOI18N
+        btnCSearch.setText("SEARCH");
+        btnCSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCSearchActionPerformed(evt);
+            }
+        });
+
+        jLabel10.setFont(new java.awt.Font("Schadow BT", 1, 14)); // NOI18N
+        jLabel10.setText("BOOKING DATE:");
+
+        btnRefresh.setFont(new java.awt.Font("Schadow BT", 1, 14)); // NOI18N
+        btnRefresh.setText("REFRESH");
+        btnRefresh.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRefreshActionPerformed(evt);
+            }
+        });
+
+        btnReturn.setFont(new java.awt.Font("Schadow BT", 1, 14)); // NOI18N
+        btnReturn.setText("RETURN");
+        btnReturn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnReturnActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(53, 53, 53)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(textCityAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jLabel4)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(textClientID, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(jLabel5))
+                                .addGap(27, 27, 27)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(jLabel6)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jLabel3)
+                                            .addComponent(textCLName, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addGap(18, 18, 18)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(textCFName, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(jLabel2)))
+                                    .addComponent(textHomeAdd))
+                                .addGap(18, 18, 18)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel7)
+                                    .addComponent(textCnumber)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(textClientConcern, javax.swing.GroupLayout.PREFERRED_SIZE, 397, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel8))
+                                .addGap(18, 18, 18)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(textBookingDate, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(80, 80, 80)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jLabel9)
+                                            .addGroup(layout.createSequentialGroup()
+                                                .addComponent(textCSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(btnCSearch))))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jLabel10)
+                                        .addGap(211, 211, 211)
+                                        .addComponent(btnSaveBook)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                            .addComponent(btnDeleteBook, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(btnEditBook, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addGap(21, 21, 21))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(14, 14, 14)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(btnReturn)
+                                .addGap(281, 281, 281)
+                                .addComponent(jLabel1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnRefresh, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(21, 21, 21))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 1046, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(16, 16, 16)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnRefresh, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnReturn))
+                .addGap(12, 12, 12)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel2)
+                                    .addComponent(jLabel7))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(textCFName, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(textCnumber, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel3)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(textCLName, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jLabel5)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(textCityAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jLabel6)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(textHomeAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(18, 18, 18)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel8)
+                                    .addComponent(jLabel10)))
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addComponent(btnEditBook, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGap(13, 13, 13)
+                                    .addComponent(btnDeleteBook, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(btnSaveBook, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(11, 11, 11)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(textClientConcern, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel9)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(btnCSearch, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(textCSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(textBookingDate, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(textClientID, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel4)))
+                .addGap(23, 23, 23))
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void btnDeleteBookActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteBookActionPerformed
+        int row = tblClient.getSelectedRow();
+        
+        if(row == -1){
+            JOptionPane.showMessageDialog(this, "Please Select a record to delete!", "BOOKING RECORD", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this record?","Confirm Delete", JOptionPane.YES_NO_OPTION);
+        if(confirm != JOptionPane.YES_NO_OPTION){
+            return;
+        }
+        int clientID = (int) tblClient.getValueAt(row, 7);
+        int jobID = (int) tblClient.getValueAt(row, 8);
+            
+        try(Connection con = BBConnection.MSAccessConnection()){
+            con.setAutoCommit(false);
+            
+            // DELETING REPORT
+            try(PreparedStatement pst = con.prepareStatement(
+            "DELETE FROM Report WHERE jobID = ?")){
+                pst.setInt(1, jobID);
+                pst.executeUpdate();
+            }
+            
+            // DELETING JOB
+            try(PreparedStatement pst = con.prepareStatement(
+            "DELETE FROM Job WHERE clientID = ?")){
+                pst.setInt(1, clientID);
+                pst.executeUpdate();
+            }
+            
+            // DELETING CLIENT
+            try(PreparedStatement pst = con.prepareStatement(
+            "DELETE FROM Client WHERE clientID = ?")){
+                pst.setInt(1, clientID);
+                pst.executeUpdate();
+            }
+            con.commit();
+            loadClientToTable();
+            clearFields();
+            JOptionPane.showMessageDialog(this, "Record Deleted Successfully!", "BOOKING RECORD", JOptionPane.INFORMATION_MESSAGE);
+        }catch(SQLException e){
+//            e.printStackTrace();
+//            System.out.println(e.getMessage());
+              JOptionPane.showMessageDialog(this, "There are still PENDING requests booked by this Client#: " + clientID +
+              " | " + textCLName.getText() + ", " + textCFName.getText() + ". ", "SYSTEM", JOptionPane.WARNING_MESSAGE);
+        }
+    }//GEN-LAST:event_btnDeleteBookActionPerformed
+
+    private void btnCSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCSearchActionPerformed
+        String search = textCSearch.getText().trim();
+        
+        if(search.isEmpty()){
+            loadClientToTable(); // this will show all if the field is empty
+        }
+        
+        try (Connection con = BBConnection.MSAccessConnection()){
+            String sql = " SELECT Job.jobDate, " + 
+                    "Client.lastName, Client.firstName, Client.contactNum, " +
+                    "Client.cityAdd, Client.homeAdd, Report.clientConcerns, " +
+                    "Client.clientID, Job.jobID " +
+                    "FROM ((Client INNER JOIN Job ON Client.clientID = Job.clientID) " +
+                    "INNER JOIN Report ON Job.jobID = Report.jobID) " + "WHERE UCASE(Client.lastName) LIKE ?";
+            PreparedStatement pst = con.prepareStatement(sql);
+            pst.setString(1, "%" +search.toUpperCase() + "%");
+            
+            ResultSet rs = pst.executeQuery();
+            DefaultTableModel model = (DefaultTableModel) tblClient.getModel();
+            model.setRowCount(0);
+            
+            while (rs.next()){
+                model.addRow(new Object[]{
+                    rs.getDate("jobDate"),
+                    rs.getString("lastName"),
+                    rs.getString("firstName"), 
+                    rs.getString("contactNum"),
+                    rs.getString("cityAdd"),
+                    rs.getString("homeAdd"),
+                    rs.getString("clientConcerns"),
+                    rs.getInt("clientID"),
+                    rs.getInt("jobID")
+                });
+            }
+            
+            
+        } catch(SQLException e){
+            System.out.println(e.getMessage());
+        }
+    }//GEN-LAST:event_btnCSearchActionPerformed
+
+    private void btnSaveBookActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveBookActionPerformed
+        Connection con = BBConnection.MSAccessConnection();
+        
+        if(!isFormValid()){
+            JOptionPane.showMessageDialog(this, "You are REQUIRED to fill all the necessary fields for Information Purposes", "BOOKING RECORDS", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        
+        try{
+            con.setAutoCommit(false);
+            String lastName = textCLName.getText();
+            String firstName = textCFName.getText();
+            String contactNum = textCnumber.getText();
+            String cityAdd = textCityAdd.getText();
+            String homeAdd = textHomeAdd.getText();
+            String clientConcerns = textClientConcern.getText();
+            String bDate = textBookingDate.getText();
+            java.sql.Date bookingDate = java.sql.Date.valueOf(bDate); // Converting String into SQL Date
+            
+            //CLIENT
+            String sqlClient = "INSERT INTO Client (firstName, lastName, contactNum, cityAdd, homeAdd) VALUES (?, ?, ?, ?, ?)";
+            PreparedStatement pstClient = con.prepareStatement(sqlClient, Statement.RETURN_GENERATED_KEYS);
+            pstClient.setString(1, firstName);
+            pstClient.setString(2, lastName);
+            pstClient.setString(3, contactNum);
+            pstClient.setString(4, cityAdd);
+            pstClient.setString(5, homeAdd);
+            
+            pstClient.executeUpdate();
+            
+            int clientID;
+            try(ResultSet rs = pstClient.getGeneratedKeys()){
+                rs.next();
+                clientID = rs.getInt(1);
+            }
+            pstClient.close();
+            
+            // Job
+            String sqlJob = "INSERT INTO Job (clientID, jobDate, serviceFee) VALUES (?, ?, ?)";
+            PreparedStatement pstJob = con.prepareStatement(sqlJob, Statement.RETURN_GENERATED_KEYS);
+            pstJob.setInt(1, clientID);
+            pstJob.setDate(2, bookingDate);
+            pstJob.setBigDecimal(3, BigDecimal.ZERO);
+            pstJob.executeUpdate();
+            
+            int jobID;
+            try(ResultSet rs = pstJob.getGeneratedKeys()){
+                rs.next();
+                jobID = rs.getInt(1);
+            }
+            pstJob.close();
+            
+            //REPORT 
+            String sqlReport = "INSERT INTO Report (jobID, clientConcerns) VALUES (?, ?)";
+            PreparedStatement pstReport = con.prepareStatement(sqlReport, Statement.RETURN_GENERATED_KEYS);
+            pstReport.setInt(1, jobID);
+            pstReport.setString(2, clientConcerns);
+            pstReport.executeUpdate();
+            pstReport.close();
+            
+            con.commit();
+            loadClientToTable();
+            clearFields();
+            
+        } catch(IllegalArgumentException e){
+            JOptionPane.showMessageDialog(this, "Date must be YYYY-MM-DD");
+        } catch(SQLException e){
+            try{
+                con.rollback();
+            } catch(SQLException ex){
+                System.out.println(ex.getMessage());
+            }
+            System.out.println(e.getMessage());
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+        }
+    }//GEN-LAST:event_btnSaveBookActionPerformed
+
+    private void btnEditBookActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditBookActionPerformed
+        int row = tblClient.getSelectedRow();
+        
+        if(row == -1){
+            JOptionPane.showMessageDialog(this, "Select a record to first!", "BOOKING RECORD", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        
+        int clientID  = (int) tblClient.getValueAt(row, 7);
+        int jobID     = (int) tblClient.getValueAt(row, 8);
+        
+        String lastName = textCLName.getText();
+        String firstName = textCFName.getText();
+        String contactNum = textCnumber.getText();
+        String cityAdd = textCityAdd.getText();
+        String homeAdd = textHomeAdd.getText();
+        String clientConcerns = textClientConcern.getText();
+        java.sql.Date bookingDate = java.sql.Date.valueOf(textBookingDate.getText()); // YYY-MM-DD
+        
+        try(Connection con = BBConnection.MSAccessConnection()){
+            con.setAutoCommit(false);
+            
+            //UPDATE CLIENT
+            try(PreparedStatement pst = con.prepareStatement(
+            "UPDATE Client SET firstName = ?, lastName = ?, contactNum = ?, cityAdd = ?, homeAdd = ? " +
+                    "WHERE clientID = ?")){
+                pst.setString(1, firstName);
+                pst.setString(2, lastName);
+                pst.setString(3, contactNum);
+                pst.setString(4, cityAdd);
+                pst.setString(5, homeAdd);
+                pst.setInt(6, clientID);
+                pst.executeUpdate();
+            }
+           
+            // UPDATE JOB
+            try(PreparedStatement pst = con.prepareStatement(
+            "UPDATE Job SET jobDate = ? WHERE jobID = ?")){
+                pst.setDate(1, bookingDate);
+                pst.setInt(2, jobID);
+                pst.executeUpdate();
+            }
+            
+            // UPDATE REPORT 
+            try(PreparedStatement pst = con.prepareStatement(
+            "UPDATE Report SET clientConcerns = ? WHERE jobID = ?")){
+                pst.setString(1, clientConcerns);
+                pst.setInt(2, jobID);
+                pst.executeUpdate();
+            }
+            con.commit();
+            loadClientToTable();
+            clearFields();
+            JOptionPane.showMessageDialog(this, "Record Updated Successfully!", "BOOKING RECORD", JOptionPane.INFORMATION_MESSAGE);
+        } catch (SQLException e){
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+        }
+        
+    }//GEN-LAST:event_btnEditBookActionPerformed
+
+    private void textClientIDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textClientIDActionPerformed
+       // TODO add your handling code here:
+    }//GEN-LAST:event_textClientIDActionPerformed
+
+    private void textClientIDMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_textClientIDMouseClicked
+         int row = tblClient.getSelectedRow();
+        if(row == -1) return;
+        
+        try(Connection con = BBConnection.MSAccessConnection()){
+            String sql = "SELECT Client.clientID FROM Client";
+            PreparedStatement pst = con.prepareStatement(sql);
+
+            
+            ResultSet rs = pst.executeQuery();
+            if(rs.next()){
+                int clientID = rs.getInt("clientID");
+                textClientID.setText(String.valueOf(clientID));
+            }
+        } catch(SQLException e){
+            System.out.println(e.getMessage());
+        }
+    }//GEN-LAST:event_textClientIDMouseClicked
+
+    private void tblClientMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblClientMouseClicked
+        int row = tblClient.getSelectedRow();
+        if(row == -1) return;
+        
+        //hidden id
+        textClientID.setText(tblClient.getValueAt(row, 7).toString());
+        
+        // other fields matching the same column
+        textCFName.setText(tblClient.getValueAt(row, 2).toString());
+        textCLName.setText(tblClient.getValueAt(row, 1).toString());
+        textCnumber.setText(tblClient.getValueAt(row, 3).toString());
+        textCityAdd.setText(tblClient.getValueAt(row, 4).toString());
+        textHomeAdd.setText(tblClient.getValueAt(row, 5).toString());
+        textClientConcern.setText(tblClient.getValueAt(row, 6).toString());
+        textBookingDate.setText(tblClient.getValueAt(row, 0).toString());
+        
+        tblClient.getColumnModel().getColumn(7).setMinWidth(0);
+        tblClient.getColumnModel().getColumn(7).setMaxWidth(0);
+        tblClient.getColumnModel().getColumn(7).setWidth(0);
+    }//GEN-LAST:event_tblClientMouseClicked
+
+    private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
+        clearFields();
+    }//GEN-LAST:event_btnRefreshActionPerformed
+
+    private void btnReturnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReturnActionPerformed
+        mainDashboard mn = new mainDashboard();
+        mn.setLocationRelativeTo(this);
+        mn.setVisible(true);
+        
+        this.dispose();
+    }//GEN-LAST:event_btnReturnActionPerformed
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(clientForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(clientForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(clientForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(clientForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new clientForm().setVisible(true);
+            }
+        });
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JToggleButton btnCSearch;
+    private javax.swing.JButton btnDeleteBook;
+    private javax.swing.JButton btnEditBook;
+    private javax.swing.JButton btnRefresh;
+    private javax.swing.JButton btnReturn;
+    private javax.swing.JButton btnSaveBook;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable tblClient;
+    private javax.swing.JTextField textBookingDate;
+    private javax.swing.JTextField textCFName;
+    private javax.swing.JTextField textCLName;
+    private javax.swing.JTextField textCSearch;
+    private javax.swing.JTextField textCityAdd;
+    private javax.swing.JTextField textClientConcern;
+    private javax.swing.JTextField textClientID;
+    private javax.swing.JTextField textCnumber;
+    private javax.swing.JTextField textHomeAdd;
+    // End of variables declaration//GEN-END:variables
+}
